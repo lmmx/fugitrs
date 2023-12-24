@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use git2::{Repository};
+use git2::{Repository, DiffFormat, DiffLineType};
 
 #[pyfunction]
 fn get_git_diff(repo_path: String) -> PyResult<()> {
@@ -16,10 +16,15 @@ fn get_git_diff(repo_path: String) -> PyResult<()> {
     let diff = repo.diff_tree_to_workdir_with_index(Some(&head_tree), None)
                    .expect("Failed to create diff");
 
-    // Print the diff
-    diff.print(git2::DiffFormat::Patch, |_delta, _hunk, line| {
+    // Print the diff with line prefixes
+    diff.print(DiffFormat::Patch, |_delta, _hunk, line| {
         let line_content = std::str::from_utf8(line.content()).unwrap_or("");
-        println!("{}", line_content);
+        let line_prefix = match line.origin() {
+            DiffLineType::Addition => "+",
+            DiffLineType::Deletion => "-",
+            _ => " ",
+        };
+        println!("{}{}", line_prefix, line_content);
         true
     }).expect("Failed to print diff");
 
