@@ -1,22 +1,22 @@
 use pyo3::prelude::*;
-use git2::{Repository, Diff, DiffOptions};
+use git2::{Repository, DiffOptions};
 
 #[pyfunction]
-fn get_git_diff(repo_path: String, revision: String) -> PyResult<()> {
-    // Open the repository
+fn get_git_diff(repo_path: String) -> PyResult<()> {
     let repo = Repository::open(repo_path).expect("Failed to open repository");
 
-    // Determine the revisions
-    let revspec = repo.revparse(&revision).expect("Failed to parse revision");
+    // Get the tree of the current HEAD commit
+    let head_commit = repo.head()
+                          .and_then(|head| head.resolve())
+                          .and_then(|head| head.peel_to_commit())
+                          .expect("Failed to find head commit");
+    let head_tree = head_commit.tree().expect("Failed to get head tree");
 
-    let (from, to) = (revspec.from().map(|r| r.peel_to_tree().unwrap()),
-                      revspec.to().map(|r| r.peel_to_tree().unwrap()));
-
-    // Create diff
-    let diff = repo.diff_tree_to_tree(from.as_ref(), to.as_ref(), None)
+    // Perform a diff between the HEAD tree and the working directory
+    let diff = repo.diff_tree_to_workdir_with_index(Some(&head_tree), None)
                    .expect("Failed to create diff");
 
-    // Iterate over diff and print each line
+    // Print the diff
     diff.print(git2::DiffFormat::Patch, |_delta, _hunk, line| {
         let line_content = std::str::from_utf8(line.content()).unwrap_or("");
         println!("{}", line_content);
@@ -26,9 +26,8 @@ fn get_git_diff(repo_path: String, revision: String) -> PyResult<()> {
     Ok(())
 }
 
-/// A Python module implemented in Rust.
 #[pymodule]
-fn git_diff_extension(py: Python, m: &PyModule) -> PyResult<()> {
+fn fugitrs(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_git_diff, m)?)?;
 
     Ok(())
