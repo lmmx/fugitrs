@@ -30,7 +30,13 @@ fn get_git_diff(repo_path: String, plain: Option<bool>) -> PyResult<()> {
                     ("+", "", "")
                 }
             },
-            DiffLineType::Deletion => ("-","", ""),
+            DiffLineType::Deletion => {
+                if is_plain {
+                    ("-", "\x1b[31m", "\x1b[0m") // Red color for deleted lines
+                } else {
+                    ("-", "", "")
+                }
+            },
             _ => (" ", "", ""),
         };
         println!("{}{}{}{}", maybe_color_code, line_prefix, line_content, maybe_reset_code);
