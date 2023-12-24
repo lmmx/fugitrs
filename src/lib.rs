@@ -7,14 +7,14 @@ fn get_git_diff(repo_path: String, plain: Option<bool>) -> PyResult<()> {
 
     // Get the tree of the current HEAD commit
     let head_commit = repo.head()
-                          .and_then(|head| head.resolve())
-                          .and_then(|head| head.peel_to_commit())
-                          .expect("Failed to find head commit");
+        .and_then(|head| head.resolve())
+        .and_then(|head| head.peel_to_commit())
+        .expect("Failed to find head commit");
     let head_tree = head_commit.tree().expect("Failed to get head tree");
 
     // Perform a diff between the HEAD tree and the working directory
     let diff = repo.diff_tree_to_workdir_with_index(Some(&head_tree), None)
-                   .expect("Failed to create diff");
+        .expect("Failed to create diff");
 
     // Check if plain output is requested
     let is_plain = plain.unwrap_or(false);
@@ -39,7 +39,7 @@ fn get_git_diff(repo_path: String, plain: Option<bool>) -> PyResult<()> {
             },
             _ => (" ", "", ""),
         };
-        println!("{}{}{}{}", maybe_color_code, line_prefix, line_content, maybe_reset_code);
+        print!("{}{}{}{}", maybe_color_code, line_prefix, line_content, maybe_reset_code);
         true
     }).expect("Failed to print diff");
 
