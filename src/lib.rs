@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use git2::{Repository, DiffOptions};
+use git2::{Repository};
 
 #[pyfunction]
 fn get_git_diff(repo_path: String) -> PyResult<()> {
@@ -27,7 +27,7 @@ fn get_git_diff(repo_path: String) -> PyResult<()> {
 }
 
 #[pymodule]
-fn fugitrs(py: Python, m: &PyModule) -> PyResult<()> {
+fn fugitrs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_git_diff, m)?)?;
 
     Ok(())
