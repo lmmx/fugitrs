@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use git2::{Repository, DiffFormat, DiffLineType};
+use git2::{Repository, DiffFormat};
 
 #[pyfunction]
 fn get_git_diff(repo_path: String, plain: Option<bool>) -> PyResult<()> {
@@ -23,14 +23,14 @@ fn get_git_diff(repo_path: String, plain: Option<bool>) -> PyResult<()> {
     diff.print(DiffFormat::Patch, move |_delta, _hunk, line| {
         let line_content = std::str::from_utf8(line.content()).unwrap_or("");
         let (line_prefix, maybe_color_code, maybe_reset_code) = match line.origin() {
-            DiffLineType::Addition => {
+            '+' => {
                 if is_plain {
                     ("+", "\x1b[32m", "\x1b[0m") // Green color for added lines
                 } else {
                     ("+", "", "")
                 }
             },
-            DiffLineType::Deletion => {
+            '-' => {
                 if is_plain {
                     ("-", "\x1b[31m", "\x1b[0m") // Red color for deleted lines
                 } else {
