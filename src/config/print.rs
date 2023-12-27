@@ -1,14 +1,5 @@
-use pyo3::prelude::*;
-use smart_default::SmartDefault;
-
-#[derive(SmartDefault, Debug)]
-pub struct Config {
-    #[default = 1]
-    param1: i32,
-    param2: String,
-    #[default = true]
-    param3: bool,
-}
+use super::Config;
+use pyo3::prelude::*; // Import from the parent module (config)
 
 pub fn _print_config(config: Config) {
     println!(
