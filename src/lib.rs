@@ -1,5 +1,6 @@
 use git2::{DiffFormat, Repository};
 use pyo3::prelude::*;
+use smart_default::SmartDefault;
 
 #[pyfunction]
 fn get_git_diff(repo_path: String, plain: Option<bool>) -> PyResult<()> {
@@ -52,8 +53,31 @@ fn get_git_diff(repo_path: String, plain: Option<bool>) -> PyResult<()> {
     Ok(())
 }
 
+#[derive(SmartDefault, Debug)]
+struct Config {
+    #[default = 1]
+    param1: i32,
+    param2: String,
+    #[default = true]
+    param3: bool,
+}
+
+fn _print_config(config: Config) {
+    println!(
+        "1: {:?}, 2: {:?}, 3: {:?}",
+        config.param1, config.param2, config.param3
+    );
+}
+
+#[pyfunction]
+fn print_config() -> PyResult<()> {
+    _print_config(Config::default());
+    Ok(())
+}
+
 #[pymodule]
 fn fugitrs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_git_diff, m)?)?;
+    m.add_function(wrap_pyfunction!(print_config, m)?)?;
     Ok(())
 }
