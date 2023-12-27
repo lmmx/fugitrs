@@ -9,8 +9,10 @@ name = "fugitrs"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "0.19.0"
 git2 = "0.18.1"
+pyo3 = "0.19.0"
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
 smart-default = "0.7.1"
 
 [profile.release]
