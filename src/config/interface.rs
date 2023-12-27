@@ -1,3 +1,4 @@
+use bevy_reflect::{Reflect, ReflectRef, Struct};
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 use serde::{Deserialize, Serialize};
@@ -5,7 +6,7 @@ use serde_json::{to_value, Value};
 use smart_default::SmartDefault;
 
 #[pyclass(module = "fugitrs", get_all, set_all)]
-#[derive(Serialize, Deserialize, SmartDefault, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Reflect, Serialize, Deserialize, SmartDefault, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Config {
     #[default = 1]
     pub param1: i32,
@@ -22,6 +23,35 @@ impl Config {
             param1: param1.unwrap_or_default(),
             param2: param2.unwrap_or_default(),
             param3: param3.unwrap_or_default(),
+        }
+    }
+
+    fn reflecto_patronum(&self, py: Python) {
+        let instance = Config::default();
+        if let ReflectRef::Struct(reflect_struct) = instance.reflect_ref() {
+            // Iterate over the fields using the enumerate to get both index and field
+            for (i, field) in reflect_struct.iter_fields().enumerate() {
+                // Try to get the name of the field using the index
+                let field_name = reflect_struct.name_at(i).unwrap_or("Unknown field");
+
+                // The field is a &dyn Reflect, you can downcast_ref to a concrete type if you know what it is
+                // For demonstration purposes, we'll try to downcast to a common type such as i32
+                if let Some(field_value) = field.downcast_ref::<i32>() {
+                    println!("{}: {:?} is {}", field_name, field_value, field.type_name());
+                } else if let Some(field_value) = field.downcast_ref::<String>() {
+                    println!("{}: {:?} is {}", field_name, field_value, field.type_name());
+                } else if let Some(field_value) = field.downcast_ref::<bool>() {
+                    println!("{}: {:?} is {}", field_name, field_value, field.type_name());
+                } else {
+                    // Handle other types as necessary
+                    println!(
+                        "{}: {:?}",
+                        field_name, "Non-i32/String/bool value or unknown type"
+                    );
+                }
+            }
+        } else {
+            println!("The provided instance is not a Struct.");
         }
     }
 
