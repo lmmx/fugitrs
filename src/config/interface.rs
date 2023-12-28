@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::{to_value, Value};
 use smart_default::SmartDefault;
 
+use auto_struct_method_macro::auto_struct_method_macro;
+
 #[pyclass(module = "fugitrs", get_all, set_all)]
 #[derive(Reflect, Serialize, Deserialize, SmartDefault, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Config {
@@ -19,6 +21,7 @@ pub struct Config {
 impl Config {
     #[new]
     fn new(param1: Option<i32>, param2: Option<String>, param3: Option<bool>) -> Self {
+        auto_struct_method_macro!(); // This will expand to `println!("Hello, world!");`
         Config {
             param1: param1.unwrap_or_default(),
             param2: param2.unwrap_or_default(),

@@ -15,6 +15,7 @@ pyo3 = "0.19.0"
 serde = { version = "1.0.193", features = ["derive"] }
 serde_json = "1.0.108"
 smart-default = "0.7.1"
+auto_struct_method_macro = { path = "auto_struct_method_macro" }
 
 [profile.release]
 codegen-units = 1
