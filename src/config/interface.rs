@@ -34,7 +34,6 @@ impl Config {
             for (i, field) in reflect_struct.iter_fields().enumerate() {
                 // Try to get the name of the field using the index
                 let field_name = reflect_struct.name_at(i).unwrap_or("Unknown field");
-
                 // Get the TypeInfo of the field
                 if let Some(type_info) = field.get_represented_type_info() {
                     // Get the TypePathTable from the TypeInfo
@@ -49,7 +48,7 @@ impl Config {
             }
             // Join the field types into a single string
             let output = field_types.join(", ");
-            println!("{}", output);
+            println!("fn new({}) -> Self", output);
         } else {
             println!("The provided instance is not a Struct.");
         }
