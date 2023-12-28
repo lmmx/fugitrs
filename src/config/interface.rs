@@ -21,8 +21,8 @@ pub struct Config {
 impl Config {
     #[new]
     fn new(param1: Option<i32>, param2: Option<String>, param3: Option<bool>) -> Self {
-        auto_struct_method_macro!(); // This will expand to `println!("Hello, world!");`
-        Config {
+        auto_struct_method_macro!();
+        Self {
             param1: param1.unwrap_or_default(),
             param2: param2.unwrap_or_default(),
             param3: param3.unwrap_or_default(),
