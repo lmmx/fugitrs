@@ -30,6 +30,7 @@ impl Config {
         let instance = Config::default();
         if let ReflectRef::Struct(reflect_struct) = instance.reflect_ref() {
             // Iterate over the fields using the enumerate to get both index and field
+            let mut field_types = Vec::new();
             for (i, field) in reflect_struct.iter_fields().enumerate() {
                 // Try to get the name of the field using the index
                 let field_name = reflect_struct.name_at(i).unwrap_or("Unknown field");
@@ -38,12 +39,17 @@ impl Config {
                 if let Some(type_info) = field.get_represented_type_info() {
                     // Get the TypePathTable from the TypeInfo
                     let type_path_table = type_info.type_path_table();
-                    println!("{}: Path: {}", field_name, type_path_table.short_path());
+                    let field_path = type_path_table.short_path();
+                    let formatted_type = format!("{}: Option<{}>", field_name, field_path);
+                    field_types.push(formatted_type);
                 } else {
                     // Handle the case where TypeInfo is not available
-                    println!("{}: TypeInfo not available", field_name);
+                    field_types.push(format!("{}: TypeInfo not available", field_name));
                 }
             }
+            // Join the field types into a single string
+            let output = field_types.join(", ");
+            println!("{}", output);
         } else {
             println!("The provided instance is not a Struct.");
         }
