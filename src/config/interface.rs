@@ -1,4 +1,4 @@
-use bevy_reflect::{Reflect, ReflectRef, Struct};
+use bevy_reflect::{Reflect, ReflectRef};
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 use serde::{Deserialize, Serialize};
@@ -26,7 +26,7 @@ impl Config {
         }
     }
 
-    fn reflecto_patronum(&self, py: Python) {
+    fn reflecto_patronum(&self, _py: Python) {
         let instance = Config::default();
         if let ReflectRef::Struct(reflect_struct) = instance.reflect_ref() {
             // Iterate over the fields using the enumerate to get both index and field
@@ -34,20 +34,14 @@ impl Config {
                 // Try to get the name of the field using the index
                 let field_name = reflect_struct.name_at(i).unwrap_or("Unknown field");
 
-                // The field is a &dyn Reflect, you can downcast_ref to a concrete type if you know what it is
-                // For demonstration purposes, we'll try to downcast to a common type such as i32
-                if let Some(field_value) = field.downcast_ref::<i32>() {
-                    println!("{}: {:?} is {}", field_name, field_value, field.type_name());
-                } else if let Some(field_value) = field.downcast_ref::<String>() {
-                    println!("{}: {:?} is {}", field_name, field_value, field.type_name());
-                } else if let Some(field_value) = field.downcast_ref::<bool>() {
-                    println!("{}: {:?} is {}", field_name, field_value, field.type_name());
+                // Get the TypeInfo of the field
+                if let Some(type_info) = field.get_represented_type_info() {
+                    // Get the TypePathTable from the TypeInfo
+                    let type_path_table = type_info.type_path_table();
+                    println!("{}: Path: {}", field_name, type_path_table.short_path());
                 } else {
-                    // Handle other types as necessary
-                    println!(
-                        "{}: {:?}",
-                        field_name, "Non-i32/String/bool value or unknown type"
-                    );
+                    // Handle the case where TypeInfo is not available
+                    println!("{}: TypeInfo not available", field_name);
                 }
             }
         } else {
