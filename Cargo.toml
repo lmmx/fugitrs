@@ -2,6 +2,9 @@
 name = "fugitrs"
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/lmmx/fugitrs"
+authors = ["Louis Maddox <louismmx@gmail.com>"]
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
